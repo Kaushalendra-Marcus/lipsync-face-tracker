@@ -85,6 +85,10 @@ video_bbox_app/
 │           ├── bbox.js         # forward-fill math, XYWH helpers
 │           └── api.js          # Flask API client
 ├── docs/banner.svg             # README hero banner
+├── section4/                   # Sec 4 Hindi-dub deliverables
+│   ├── speaker1_bbox.pkl       # Speaker 1 face track (1740 entries)
+│   ├── speaker2_bbox.pkl       # Speaker 2 face track (1740 entries)
+│   └── combined_preview.mp4    # both boxes + names, H.264 + AAC
 └── README.md
 ```
 
