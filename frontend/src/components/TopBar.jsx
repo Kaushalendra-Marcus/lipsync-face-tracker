@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DownloadIcon, FolderOpenIcon, GearIcon, RedoIcon, SaveIcon, UndoIcon } from './icons';
+import { DownloadIcon, FolderOpenIcon, GearIcon, LogoIcon, RedoIcon, SaveIcon, UndoIcon } from './icons';
 
 /** Top application bar: brand + project actions. SVG only. */
 export default function TopBar({ onOpenVideo, onSaveProject, onExport, exporting, canUndo, canRedo, onUndo, onRedo }) {
@@ -7,7 +7,7 @@ export default function TopBar({ onOpenVideo, onSaveProject, onExport, exporting
   return (
     <header className="topbar">
       <div className="brand">
-        <span className="brand-icon">+</span>
+        <span className="brand-logo"><LogoIcon /></span>
         <div>
           <div className="brand-title">FaceTrack Annotator</div>
           <div className="brand-sub">Track faces. Create keyframes. Export for lip-sync.</div>

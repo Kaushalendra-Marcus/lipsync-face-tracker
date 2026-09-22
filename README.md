@@ -35,11 +35,42 @@ python backend/main.py --video /path/to/video.mp4 --outdir ./outputs
 - `{name}_bbox.pkl` — one entry per frame: `[x1, y1, x2, y2]` or `[]`
 - `{name}_bbox_preview.mp4` — same frames, box + frame number, H.264 + AAC
 
-## Layout
+## Assignment notes
+
+- Bounding boxes are stored in source-video pixel coordinates.
+- Keyframes are forward-filled exactly, with no interpolation.
+- Absent speaker frames export as `[]`.
+- The exported pickle contains one item per source frame.
+- Preview rendering uses the same expanded per-frame list as the pickle.
+
+## Structure
 
 ```
-backend/   Flask API (routes/) + services (video, bbox, export)
-frontend/  React 18 + Vite (components, hooks, utils)
+video_bbox_app/
+├── backend/
+│   ├── main.py                 # CLI entry point (--video/--port/--outdir)
+│   ├── config.py               # AppConfig (paths, output filenames)
+│   ├── routes/
+│   │   ├── api.py              # /api/metadata, /video, /upload, /export, /download
+│   │   └── views.py            # serves the React build
+│   └── services/
+│       ├── video_service.py    # fps / size / frame-count probing
+│       ├── bbox_service.py     # keyframe model + forward-fill
+│       └── export_service.py   # pickle + H.264/AAC preview render
+├── frontend/src/
+│   ├── App.jsx                 # shell, shortcuts, project save/open
+│   ├── components/
+│   │   ├── TopBar.jsx          # brand, open/save, undo/redo, export
+│   │   ├── SideLeft.jsx        # video info, speakers, annotation tools
+│   │   ├── SideRight.jsx       # keyframe controls, numeric bbox, playback
+│   │   ├── VideoStage.jsx      # video + canvas overlay (draw/move/resize)
+│   │   ├── PlayerBar.jsx       # transport, speed, volume, fullscreen
+│   │   ├── Timeline.jsx        # filmstrip + per-speaker lanes + playhead
+│   │   ├── ExportPanel.jsx     # output name, export buttons, result modal
+│   │   └── icons.jsx           # SVG icon set (no emoji)
+│   ├── hooks/useTracks.js      # multi-speaker store + undo/redo
+│   └── utils/                  # bbox math (bbox.js), api client (api.js)
+└── docs/banner.svg
 ```
 
 ## Notes

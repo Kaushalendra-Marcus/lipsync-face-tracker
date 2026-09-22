@@ -7,6 +7,8 @@ import { coverageSegments, sortedKeys } from '../utils/bbox';
  */
 export default function Timeline({ total, speakers, tracks, frame, onSeek, onDeleteKey, zoom, onZoom, thumbs }) {
   const scrollRef = useRef(null);
+  const innerRef = useRef(null);
+  const dragging = useRef(false);
   const pxPerFrame = zoom; // zoom slider directly = px per frame
 
   const rulerMarks = useMemo(() => {
@@ -21,8 +23,9 @@ export default function Timeline({ total, speakers, tracks, frame, onSeek, onDel
 
   const width = Math.max(100, (total - 1) * pxPerFrame);
 
-  // follow playhead
+  // follow playhead (paused while dragging)
   useEffect(() => {
+    if (dragging.current) return;
     const el = scrollRef.current;
     if (!el) return;
     const x = frame * pxPerFrame;
@@ -30,6 +33,39 @@ export default function Timeline({ total, speakers, tracks, frame, onSeek, onDel
       el.scrollLeft = Math.max(0, x - el.clientWidth / 2);
     }
   }, [frame, pxPerFrame]);
+
+  /** Convert pointer x to frame using the first lane's geometry. */
+  const xToFrame = (clientX) => {
+    const inner = innerRef.current;
+    if (!inner || !total) return 0;
+    const lane = inner.querySelector('.tl-lane');
+    if (!lane) return 0;
+    const r = lane.getBoundingClientRect();
+    return Math.max(0, Math.min(total - 1, Math.round((clientX - r.left) / pxPerFrame)));
+  };
+
+  const onDown = (e) => {
+    if (e.button !== 0) return;
+    dragging.current = true;
+    onSeek(xToFrame(e.clientX));
+    e.preventDefault();
+  };
+  const onMove = (e) => {
+    if (dragging.current) onSeek(xToFrame(e.clientX));
+  };
+  const endDrag = () => {
+    dragging.current = false;
+  };
+
+  useEffect(() => {
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', endDrag);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', endDrag);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pxPerFrame, total]);
 
   return (
     <section className="panel timeline-panel">
@@ -43,7 +79,7 @@ export default function Timeline({ total, speakers, tracks, frame, onSeek, onDel
         </div>
       </div>
       <div className="tl-scroll" ref={scrollRef}>
-        <div className="tl-inner" style={{ width: width + 160 }}>
+        <div className="tl-inner" ref={innerRef} style={{ width: width + 160 }} onMouseDown={onDown}>
           <div className="tl-ruler">
             {rulerMarks.map((f) => (
               <span key={f} style={{ left: 120 + f * pxPerFrame }}>{f}</span>

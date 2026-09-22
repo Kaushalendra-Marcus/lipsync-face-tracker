@@ -216,7 +216,7 @@ export default function App() {
         v.src = videoUrl() + '?t=' + Date.now();
         v.load();
       }
-      say(`Switched to ${r.metadata.basename} — old tracks cleared`, 'ok');
+      say(`New video uploaded — ${(r.metadata.basename || '').replace(/^uploaded_/, '')}`, 'ok');
     } catch (e) {
       say('Upload failed: ' + (e.message || e), 'err');
     }
@@ -359,6 +359,8 @@ export default function App() {
           frame={frame}
           total={meta.total_frames}
           effBox={eff.box}
+          isKey={Object.prototype.hasOwnProperty.call(tr.activeTrack, frame)}
+          speakerName={active.name}
           onSeek={seek}
           onSetKeyframe={setKeyframe}
           onClearKeyframe={() => deleteBoxAt(frame, tr.state.activeId)}
@@ -370,8 +372,6 @@ export default function App() {
           onCommitBox={(f, box) => commitBox(f, box, tr.state.activeId)}
           onAbsent={markAbsent}
           onReturns={markReturns}
-          onPrev={() => seek(frame - 1)}
-          onNext={() => seek(frame + 1)}
         />
       </div>
 

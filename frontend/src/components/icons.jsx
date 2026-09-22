@@ -82,3 +82,13 @@ export const CursorIcon = (p) =>
   base(p, (<g><path d="M4 3l7 18 2.5-7.5L21 11z" /></g>));
 export const ResizeIcon = (p) =>
   base(p, (<g><path d="M21 3h-6" /><path d="M21 3v6" /><path d="M3 21h6" /><path d="M3 21v-6" /><rect x="7" y="7" width="10" height="10" rx="1" strokeDasharray="3 2" /></g>));
+/** App logo: tracking viewfinder + lock-on dot. */
+export const LogoIcon = (p) => (
+  <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true" {...p}>
+    <rect x="1" y="1" width="30" height="30" rx="8" fill="#2f81f7" />
+    <path d="M9 13.5V9h4.5M18.5 9H23v4.5M23 18.5V23h-4.5M13.5 23H9v-4.5"
+      stroke="#ffffff" strokeWidth="2.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="16" cy="16" r="4.2" fill="#0d1117" opacity="0.35" />
+    <circle cx="16" cy="16" r="2.6" fill="#3fb950" />
+  </svg>
+);
