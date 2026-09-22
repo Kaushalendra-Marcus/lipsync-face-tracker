@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d1117"/>
+      <stop offset="1" stop-color="#161b22"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2f81f7"/>
+      <stop offset="1" stop-color="#3fb950"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="320" fill="url(#bg)" rx="16"/>
+  <rect x="0" y="0" width="1200" height="6" fill="url(#accent)"/>
+  <g transform="translate(80,110)">
+    <rect x="0" y="0" width="72" height="72" rx="14" fill="#2f81f7"/>
+    <text x="36" y="52" font-family="Arial,sans-serif" font-size="44" font-weight="bold" fill="#ffffff" text-anchor="middle">+</text>
+    <circle cx="60" cy="12" r="10" fill="#3fb950"/>
+    <circle cx="60" cy="12" r="4" fill="#0d1117"/>
+  </g>
+  <text x="180" y="150" font-family="Arial,sans-serif" font-size="52" font-weight="bold" fill="#e6edf3">FaceTrack Annotator</text>
+  <text x="182" y="188" font-family="Arial,sans-serif" font-size="22" fill="#8b949e">Keyframe-based speaker tracking for lip-sync dubbing</text>
+  <g font-family="Arial,sans-serif" font-size="18" font-weight="bold">
+    <rect x="182" y="212" width="110" height="36" rx="18" fill="#1c2534" stroke="#30363d"/>
+    <text x="237" y="236" fill="#e6edf3" text-anchor="middle">React 18</text>
+    <rect x="302" y="212" width="100" height="36" rx="18" fill="#1c2534" stroke="#30363d"/>
+    <text x="352" y="236" fill="#e6edf3" text-anchor="middle">Flask 3</text>
+    <rect x="412" y="212" width="130" height="36" rx="18" fill="#1c2534" stroke="#30363d"/>
+    <text x="477" y="236" fill="#e6edf3" text-anchor="middle">OpenCV</text>
+    <rect x="552" y="212" width="110" height="36" rx="18" fill="#1c2534" stroke="#30363d"/>
+    <text x="607" y="236" fill="#e6edf3" text-anchor="middle">FFmpeg</text>
+  </g>
+  <g transform="translate(950,90)" opacity="0.9">
+    <rect x="0" y="0" width="170" height="140" rx="8" fill="none" stroke="#3fb950" stroke-width="3"/>
+    <line x1="56" y1="0" x2="56" y2="140" stroke="#ffffff" stroke-width="1" opacity="0.4"/>
+    <line x1="113" y1="0" x2="113" y2="140" stroke="#ffffff" stroke-width="1" opacity="0.4"/>
+    <line x1="0" y1="46" x2="170" y2="46" stroke="#ffffff" stroke-width="1" opacity="0.4"/>
+    <line x1="0" y1="93" x2="170" y2="93" stroke="#ffffff" stroke-width="1" opacity="0.4"/>
+    <circle cx="0" cy="0" r="7" fill="#ffffff"/>
+    <circle cx="170" cy="0" r="7" fill="#ffffff"/>
+    <circle cx="0" cy="140" r="7" fill="#ffffff"/>
+    <circle cx="170" cy="140" r="7" fill="#ffffff"/>
+  </g>
+</svg>
