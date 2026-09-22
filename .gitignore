@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+ENV/
+
+# Node / frontend build
+node_modules/
+frontend/dist/
+
+# App outputs (generated per run, never commit)
+outputs/
+uploaded_*.mp4
+uploaded_*.mov
+*_bbox.pkl
+*_bbox_preview.mp4
+*.ftrack.json
+
+# Videos / large media (keep repo light; link or Git LFS instead)
+*.mp4
+*.mov
+*.mkv
+*.wav
+
+# Logs & OS
+*.log
+.DS_Store
+Thumbs.db
