@@ -24,22 +24,22 @@ pip install -r backend/requirements.txt
 cd frontend && npm install && npm run build && cd ..
 
 python backend/main.py --video /path/to/video.mp4 --outdir ./outputs
-# → http://127.0.0.1:5000
+# -> http://127.0.0.1:5000
 ```
 
 > `.mov` won't play in-browser? `ffmpeg -i in.mov -c copy out.mp4`
 
 ## Use
 
-1. Scrub to the speaker's first frame → draw a box (`B`)
-2. Step forward (`→`) → move / resize when it drifts — each edit is a keyframe
-3. Speaker leaves → `N` (absent) · returns → restore or redraw
-4. Wrong keyframe → `D` · Export → `E`
+1. Scrub to the speaker's first frame -> draw a box (`B`)
+2. Step forward (`->`) -> move / resize when it drifts - each edit is a keyframe
+3. Speaker leaves -> `N` (absent) · returns -> restore or redraw
+4. Wrong keyframe -> `D` · Export -> `E`
 
 ## Export
 
-- `{name}_bbox.pkl` — one entry per frame: `[x1, y1, x2, y2]` or `[]`
-- `{name}_bbox_preview.mp4` — same frames, box + frame number, H.264 + AAC
+- `{name}_bbox.pkl` - one entry per frame: `[x1, y1, x2, y2]` or `[]`
+- `{name}_bbox_preview.mp4` - same frames, box + frame number, H.264 + AAC
 
 ## Assignment notes
 
