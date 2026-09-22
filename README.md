@@ -50,6 +50,7 @@ video_bbox_app/
 ├── backend/
 │   ├── main.py                 # CLI entry point (--video/--port/--outdir)
 │   ├── config.py               # AppConfig (paths, output filenames)
+│   ├── requirements.txt        # flask, opencv-python, numpy
 │   ├── routes/
 │   │   ├── api.py              # /api/metadata, /video, /upload, /export, /download
 │   │   └── views.py            # serves the React build
@@ -57,20 +58,28 @@ video_bbox_app/
 │       ├── video_service.py    # fps / size / frame-count probing
 │       ├── bbox_service.py     # keyframe model + forward-fill
 │       └── export_service.py   # pickle + H.264/AAC preview render
-├── frontend/src/
-│   ├── App.jsx                 # shell, shortcuts, project save/open
-│   ├── components/
-│   │   ├── TopBar.jsx          # brand, open/save, undo/redo, export
-│   │   ├── SideLeft.jsx        # video info, speakers, annotation tools
-│   │   ├── SideRight.jsx       # keyframe controls, numeric bbox, playback
-│   │   ├── VideoStage.jsx      # video + canvas overlay (draw/move/resize)
-│   │   ├── PlayerBar.jsx       # transport, speed, volume, fullscreen
-│   │   ├── Timeline.jsx        # filmstrip + per-speaker lanes + playhead
-│   │   ├── ExportPanel.jsx     # output name, export buttons, result modal
-│   │   └── icons.jsx           # SVG icon set (no emoji)
-│   ├── hooks/useTracks.js      # multi-speaker store + undo/redo
-│   └── utils/                  # bbox math (bbox.js), api client (api.js)
-└── docs/banner.svg
+├── frontend/
+│   ├── index.html              # title + favicon
+│   ├── public/favicon.svg      # app logo
+│   └── src/
+│       ├── main.jsx            # React entry
+│       ├── App.jsx             # shell, shortcuts, project save/open
+│       ├── index.css           # dark editor theme
+│       ├── components/
+│       │   ├── TopBar.jsx          # brand, open/save, undo/redo, export
+│       │   ├── SideLeft.jsx        # video info, speakers, annotation tools
+│       │   ├── SideRight.jsx       # keyframe controls, numeric bbox, playback
+│       │   ├── VideoStage.jsx      # video + canvas overlay (draw/move/resize)
+│       │   ├── PlayerBar.jsx       # transport, speed, volume, fullscreen
+│       │   ├── Timeline.jsx        # filmstrip + per-speaker lanes + playhead
+│       │   ├── ExportPanel.jsx     # output name, export buttons, result modal
+│       │   └── icons.jsx           # SVG icon set + logo (no emoji)
+│       ├── hooks/useTracks.js  # multi-speaker store + undo/redo
+│       └── utils/
+│           ├── bbox.js         # forward-fill math, XYWH helpers
+│           └── api.js          # Flask API client
+├── docs/banner.svg             # README hero banner
+└── README.md
 ```
 
 ## Notes
