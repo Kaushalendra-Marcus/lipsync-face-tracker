@@ -9,6 +9,12 @@
 Keyframe-based speaker tracking for lip-sync dubbing. Draw a box, step through
 frames, mark absent segments, export a per-frame pickle + H.264 preview.
 
+## Demo
+
+- Walkthrough Part 1: https://www.loom.com/share/4ca3fe63ee754c2482100d71c1338780
+- Walkthrough Part 2: https://www.loom.com/share/ce6fa0d50f3f4036ac8bb28831e2b563
+- Assignment notes: https://app.notion.com/p/FDE-Interview-Assignment-sync-3e36a08d444481a8b0f7e8aa55f745cf?source=copy_link
+
 ## Run
 
 ```bash
