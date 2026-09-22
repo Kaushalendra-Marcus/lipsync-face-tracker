@@ -21,6 +21,17 @@ export async function exportKeyframes(keyframes, label = 'speaker') {
   return data;
 }
 
+export async function exportAll(tracks) {
+  const res = await fetch('/api/export_all', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tracks }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || res.statusText);
+  return data;
+}
+
 export async function uploadVideo(file) {
   const form = new FormData();
   form.append('file', file);

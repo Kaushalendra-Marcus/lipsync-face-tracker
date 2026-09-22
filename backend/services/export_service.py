@@ -91,6 +91,98 @@ def render_preview(video_path: str, full_list: list, preview_path: str) -> dict:
             os.remove(tmp)
 
 
+def _hex_to_bgr(value: str):
+    """'#3b82f6' -> (246, 130, 59). Falls back to green."""
+    try:
+        h = str(value).lstrip("#")
+        r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+        return (b, g, r)
+    except (ValueError, IndexError, TypeError):
+        return (0, 255, 0)
+
+
+def render_preview_multi(video_path: str, series: list, preview_path: str) -> dict:
+    """One preview with ALL speakers drawn (own color + name tag each).
+
+    series: list of (display_name, full_list, bgr_color).
+    """
+    fd, tmp = tempfile.mkstemp(suffix="_silent.mp4")
+    os.close(fd)
+    try:
+        cap = cv2.VideoCapture(video_path)
+        if not cap.isOpened():
+            raise RuntimeError(f"Cannot open video for preview: {video_path}")
+        try:
+            fps = cap.get(cv2.CAP_PROP_FPS)
+            if not fps or fps != fps:
+                fps = 30.0
+            width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+            height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            total = len(series[0][1]) if series else 0
+            fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+            out = cv2.VideoWriter(tmp, fourcc, fps, (width, height))
+            if not out.isOpened():
+                raise RuntimeError("Cannot open VideoWriter for preview (mp4v).")
+            try:
+                for frame_idx in range(total):
+                    ret, frame = cap.read()
+                    if not ret:
+                        frame = np.zeros((height, width, 3), dtype=np.uint8)
+                    for name, full, bgr in series:
+                        box = full[frame_idx]
+                        if not (isinstance(box, (list, tuple)) and len(box) == 4):
+                            continue
+                        x1, y1, x2, y2 = (int(v) for v in box)
+                        cv2.rectangle(frame, (x1, y1), (x2, y2), bgr, 2)
+                        (tw, th), _ = cv2.getTextSize(name, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
+                        ty = max(0, y1 - th - 12)
+                        cv2.rectangle(frame, (x1, ty), (x1 + tw + 10, ty + th + 10), bgr, -1)
+                        cv2.putText(frame, name, (x1 + 5, ty + th + 4),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2, cv2.LINE_AA)
+                    label = f"FRAME {frame_idx}"
+                    (tw, th), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.9, 2)
+                    cv2.rectangle(frame, (8, 8), (8 + tw + 12, 8 + th + 12), (0, 0, 0), -1)
+                    cv2.putText(frame, label, (14, 14 + th), cv2.FONT_HERSHEY_SIMPLEX,
+                                0.9, (255, 255, 255), 2, cv2.LINE_AA)
+                    out.write(frame)
+            finally:
+                out.release()
+        finally:
+            cap.release()
+        if transcode_with_audio(tmp, video_path, preview_path):
+            return {"has_audio": True, "codec_note": "h264+aac"}
+        shutil.copyfile(tmp, preview_path)
+        return {"has_audio": False, "codec_note": "mp4v-silent (ffmpeg missing/failed)"}
+    finally:
+        if os.path.exists(tmp):
+            os.remove(tmp)
+
+
+def run_export_all(video_path: str, outdir: str, tracks: dict,
+                   width: int, height: int, total: int) -> dict:
+    """Export every speaker's pkl + one combined preview.
+
+    tracks: {label: {"keyframes": {...}, "color": "#hex", "name": "Display"}}.
+    """
+    if not tracks:
+        raise ValueError("No speaker tracks provided.")
+    os.makedirs(outdir, exist_ok=True)
+    files = []
+    series = []
+    for label, spec in tracks.items():
+        full, ordered = build_full_list(spec.get("keyframes", {}), total, width, height)
+        pkl_name = f"{label}_bbox.pkl"
+        with open(os.path.join(outdir, pkl_name), "wb") as handle:
+            pickle.dump(full, handle)
+        files.append({"label": label, "pkl_name": pkl_name,
+                      "num_keyframes": len(ordered), **stats_for(full)})
+        series.append((spec.get("name", label), full, _hex_to_bgr(spec.get("color"))))
+    preview_name = "all_speakers_bbox_preview.mp4"
+    info = render_preview_multi(video_path, series, os.path.join(outdir, preview_name))
+    return {"ok": True, "video": os.path.basename(video_path),
+            "files": files, "preview_name": preview_name, **info}
+
+
 def run_export(video_path: str, outdir: str, keyframes: dict,
                width: int, height: int, total: int, label: str = "speaker") -> dict:
     """Build full list, validate length, write pkl + preview. Returns result dict."""

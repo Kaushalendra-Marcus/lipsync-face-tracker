@@ -85,6 +85,34 @@ def export():
     return jsonify(result)
 
 
+@bp.post("/api/export_all")
+def export_all():
+    cfg = _cfg()
+    data = request.get_json(force=True) or {}
+    raw_tracks = data.get("tracks", {}) or {}
+    meta = video_service.get_metadata(cfg.video_path)
+    tracks = {}
+    seen = set()
+    for _id, spec in raw_tracks.items():
+        base = _label_from({"label": (spec or {}).get("label", "speaker")})
+        label, i = base, 2
+        while label in seen:
+            label, i = f"{base}_{i}", i + 1
+        seen.add(label)
+        tracks[label] = {
+            "keyframes": (spec or {}).get("keyframes", {}),
+            "color": (spec or {}).get("color", "#22c55e"),
+            "name": str((spec or {}).get("name", label))[:40],
+        }
+    try:
+        result = export_service.run_export_all(
+            cfg.video_path, cfg.outdir, tracks,
+            meta["width"], meta["height"], meta["total_frames"])
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    return jsonify(result)
+
+
 @bp.get("/api/download/<name>")
 def download(name: str):
     cfg = _cfg()

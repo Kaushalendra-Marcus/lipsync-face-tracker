@@ -253,17 +253,17 @@ button:focus-visible, input:focus-visible, select:focus-visible {
 .export-panel { max-width: 1700px; width: calc(100% - 32px); margin: 12px auto; flex-shrink: 0; }
 .export-panel h3 { margin: 0 0 10px; font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; color: var(--dim); text-transform: uppercase; }
 .export-grid { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
-.export-pkl, .export-mp4 {
+.export-pkl, .export-mp4, .export-all {
   display: inline-flex; align-items: center; gap: 8px; color: #fff; font-weight: 500;
   border: 1px solid rgba(240,246,252,0.08); border-radius: 6px; padding: 9px 16px;
   cursor: pointer; font-size: 13px;
 }
 .export-pkl { background: var(--green); }
 .export-mp4 { background: var(--acc); }
-.export-mp4:hover:not(:disabled) { background: var(--acc-hover); }
-.export-pkl:hover:not(:disabled) { background: var(--green-hover); }
-.export-pkl svg, .export-mp4 svg { width: 16px; height: 16px; }
-.export-pkl:disabled, .export-mp4:disabled { opacity: 0.6; cursor: wait; }
+.export-all { background: #6e40c9; font-weight: 600; }
+.export-all:hover:not(:disabled) { filter: brightness(1.12); }
+.export-pkl svg, .export-mp4 svg, .export-all svg { width: 16px; height: 16px; }
+.export-pkl:disabled, .export-mp4:disabled, .export-all:disabled { opacity: 0.6; cursor: wait; }
 
 /* result modal */
 .modal-backdrop {

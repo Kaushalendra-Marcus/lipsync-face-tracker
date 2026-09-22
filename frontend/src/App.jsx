@@ -7,7 +7,7 @@ import Timeline from './components/Timeline';
 import TopBar from './components/TopBar';
 import VideoStage from './components/VideoStage';
 import { useTracks } from './hooks/useTracks';
-import { exportKeyframes, getMetadata, uploadVideo, videoUrl } from './utils/api';
+import { exportAll, exportKeyframes, getMetadata, uploadVideo, videoUrl } from './utils/api';
 import { effectiveBox, slugify } from './utils/bbox';
 
 function fmtClock(frame, fps) {
@@ -193,7 +193,14 @@ export default function App() {
           'Reloaded to match backend — verify tracks, then export again.', 'err');
         return;
       }
-      setResult(r);
+      setResult({
+        files: [{ pkl_name: r.pkl_name, label: r.label,
+                  num_keyframes: r.num_keyframes,
+                  frames_with_box: r.frames_with_box, frames_absent: r.frames_absent }],
+        preview_name: r.preview_name,
+        video: r.video,
+        has_audio: r.has_audio,
+      });
       setShowResult(true);
       say(`Done: ${r.total_frames} frames (${r.frames_with_box} box, ${r.frames_absent} absent) → ${r.pkl_name}`, 'ok');
     } catch (e) {
@@ -203,6 +210,38 @@ export default function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tr.activeTrack, tr.keys.length, outName]);
+
+  const doExportAll = useCallback(async () => {
+    const payload = {};
+    for (const s of tr.state.speakers) {
+      const t = tr.state.tracks[s.id] || {};
+      if (!Object.keys(t).length) continue;
+      payload[s.id] = { label: slugify(s.name), keyframes: t, color: s.color, name: s.name };
+    }
+    if (!Object.keys(payload).length) {
+      say('Nothing to export — draw at least one box.', 'err');
+      return;
+    }
+    setExporting(true);
+    say(`Exporting ${Object.keys(payload).length} speakers + combined preview…`, 'warn');
+    try {
+      const r = await exportAll(payload);
+      if (r.video && r.video !== meta.basename) {
+        await resyncVideo();
+        say(`Stopped: backend is serving ${r.video}, but UI showed ${meta.basename}. ` +
+          'Reloaded to match backend — verify tracks, then export again.', 'err');
+        return;
+      }
+      setResult({ files: r.files, preview_name: r.preview_name, video: r.video, has_audio: r.has_audio });
+      setShowResult(true);
+      say(`Done: ${r.files.map((f) => f.pkl_name).join(', ')} + combined preview`, 'ok');
+    } catch (e) {
+      say('Export all failed: ' + (e.message || e), 'err');
+    } finally {
+      setExporting(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tr.state]);
 
   const onUploadFile = async (file) => {
     try {
@@ -311,6 +350,7 @@ export default function App() {
       else if (k === 'k') setKeyframe();
       else if (k === 'n') markAbsent();
       else if (k === 'd') deleteBoxAt(frame, tr.state.activeId);
+      else if (k === 'e' && e.shiftKey) doExportAll();
       else if (k === 'e') doExport();
     };
     window.addEventListener('keydown', onKey);
@@ -429,6 +469,7 @@ export default function App() {
         onOutName={setOutName}
         onExportPkl={doExport}
         onExportPreview={doExport}
+        onExportAll={doExportAll}
         exporting={exporting}
         result={result}
         showResult={showResult}
