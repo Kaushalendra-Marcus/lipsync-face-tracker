@@ -187,6 +187,12 @@ export default function App() {
     try {
       const label = slugify(outName || active.name);
       const r = await exportKeyframes(tr.activeTrack, label);
+      if (r.video && r.video !== meta.basename) {
+        await resyncVideo();
+        say(`Stopped: backend is serving ${r.video}, but UI showed ${meta.basename}. ` +
+          'Reloaded to match backend — verify tracks, then export again.', 'err');
+        return;
+      }
       setResult(r);
       setShowResult(true);
       say(`Done: ${r.total_frames} frames (${r.frames_with_box} box, ${r.frames_absent} absent) → ${r.pkl_name}`, 'ok');
@@ -202,13 +208,16 @@ export default function App() {
     try {
       say('Uploading video…', 'warn');
       const r = await uploadVideo(file);
+      const prev = r.prev_video;
+      const same = prev && prev.basename === r.metadata.basename
+        && prev.total_frames === r.metadata.total_frames;
       setMeta(r.metadata);
       capturedFor.current = '';
       setThumbs([]);
       setResult(null);
+      setShowResult(false);
       setFrame(0);
       setHiddenIds({});
-      tr.clearAllTracks();
       const v = videoRef.current;
       if (v) {
         v.pause();
@@ -216,11 +225,39 @@ export default function App() {
         v.src = videoUrl() + '?t=' + Date.now();
         v.load();
       }
-      say(`New video uploaded — ${(r.metadata.basename || '').replace(/^uploaded_/, '')}`, 'ok');
+      if (same) {
+        say(`Reloaded same video — ${r.metadata.total_frames} frames, tracks kept`, 'ok');
+      } else {
+        tr.clearAllTracks();
+        const display = (r.metadata.basename || '').replace(/^uploaded_/, '');
+        say(`New video uploaded — ${display} (${r.metadata.total_frames} frames), old tracks cleared`, 'ok');
+      }
     } catch (e) {
       say('Upload failed: ' + (e.message || e), 'err');
     }
   };
+
+  /** Re-sync UI with whatever video the backend currently serves. */
+  const resyncVideo = useCallback(async () => {
+    try {
+      const m = await getMetadata();
+      setMeta(m);
+      capturedFor.current = '';
+      setThumbs([]);
+      setFrame(0);
+      const v = videoRef.current;
+      if (v) {
+        v.pause();
+        setPlaying(false);
+        v.src = videoUrl() + '?t=' + Date.now();
+        v.load();
+      }
+      return m;
+    } catch (e) {
+      say('Resync failed: ' + (e.message || e), 'err');
+      return null;
+    }
+  }, []);
 
   const saveProject = useCallback(() => {
     const data = {

@@ -47,11 +47,27 @@ def upload():
     handle = request.files["file"]
     if not handle.filename:
         return jsonify({"error": "empty filename"}), 400
+    try:
+        prev = video_service.get_metadata(cfg.video_path)
+        prev_info = {"basename": prev["basename"], "total_frames": prev["total_frames"]}
+    except Exception:
+        prev_info = None
     dest = os.path.join(cfg.outdir, "uploaded_" + handle.filename)
     handle.save(dest)
     cfg.video_path = os.path.abspath(dest)
+    _remember_video(cfg)
     return jsonify({"ok": True, "video_path": cfg.video_path,
+                    "prev_video": prev_info,
                     "metadata": video_service.get_metadata(cfg.video_path)})
+
+
+def _remember_video(cfg) -> None:
+    """Persist current video so restarts don't silently revert to startup file."""
+    try:
+        with open(os.path.join(cfg.outdir, ".last_video"), "w") as handle:
+            handle.write(cfg.video_path)
+    except OSError:
+        pass
 
 
 @bp.post("/api/export")

@@ -108,6 +108,7 @@ def run_export(video_path: str, outdir: str, keyframes: dict,
     result = {
         "ok": True,
         "label": label,
+        "video": os.path.basename(video_path),
         "pkl_name": pkl_name,
         "preview_name": preview_name,
         "pkl_path": pkl_path,
